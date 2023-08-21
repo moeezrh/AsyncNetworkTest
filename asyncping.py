@@ -30,7 +30,6 @@ async def do_ping(host, duration):
         dt_print = now.strftime("%m/%d/%Y at %H:%M:%S PST ")
         state_before = "ONLINE"
 
-        print("\nPinging...")
 
         total_offline = 0
         total_online = 0
@@ -70,7 +69,6 @@ async def do_ping(host, duration):
                 total_offline += off_time
                 file.write("\nOFFLINE for " + str(on_time) + " s DISCONNECTED DUE TO TIMEOUT")
             elif state_before == state_after:
-                print("Ping Test Done")
                 end_time = time.time()
                 on_time = end_time - start_time
                 total_online += on_time
@@ -162,10 +160,13 @@ async def main():
 
     hosts = ip_addresses
 
+    print("\nPinging...")
+
     tasks = [do_ping(host, duration) for host in hosts]
     await asyncio.gather(*tasks)
 
-
+    print("Ping Test Complete")
+    
     # Summary File Header
     with open(outputSummaryFile, "a") as file:
         file.write("Summary Results\n\n" + str(hours) + " Hour Test\n\nSTART TIME: " + start_time + "\n\n")
