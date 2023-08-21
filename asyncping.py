@@ -37,7 +37,7 @@ async def do_ping(host, duration):
         uptime = 0
         result = 0
 
-        file.write("EVENT LOG:\n")
+        file.write("EVENT LOG:")
 
         while ((time.time() - program_start_time) < duration) and retry_count < max_retries:
             try:           
@@ -87,7 +87,7 @@ async def do_ping(host, duration):
                 result = "PASS"
             else:
                 result = "FAIL"
-            file.write("\nSUMMARY: \n" + host + "\t\t" + str(uptime) + "\t\t" + result + "\nSUMMARY END")    
+            file.write("\nSUMMARY: \n" + host + "\t\t" + str(uptime) + "% uptime" + "\t\t" + result + "\nSUMMARY END")    
         
 
 
@@ -186,7 +186,7 @@ async def main():
             event_file_start = output.find("EVENT LOG:")
             event_file_end = output.find("EVENT LOG END")
             event_file = output[event_file_start + 10: event_file_end]
-            destination_file.write("\n" + file_ip + ":" + event_file + "\n")
+            destination_file.write(file_ip + ":" + event_file + "\n")
         with open(each_file, "r") as source_file, open(outputSummaryFile, "a") as destination_file:
             output = source_file.read()
             summary_file_start = output.find("SUMMARY")
