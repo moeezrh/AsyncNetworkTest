@@ -18,9 +18,12 @@ def scan(ip):
 def ip_results(result):
     print("-----------------------------------\nIP Address\tMAC Address\n-----------------------------------")
     ips = []
+    excluded_ips = ["e4:5f:01:c0:98:44",
+                    "d8:3a:dd:0c:85:62",
+                    "e4:5f:01:c1:0c:75"]
     for i in result:
         macAddr = (i["mac"])
-        if macAddr[0:8] == "d8:3a:dd" or macAddr[0:8] == "e4:5f:01":
+        if macAddr[0:8] == "d8:3a:dd" or macAddr[0:8] == "e4:5f:01" and (macAddr not in excluded_ips):
             print("{}\t{}".format(i["ip"], i["mac"]))
             ips.append(i["ip"])
     return ips

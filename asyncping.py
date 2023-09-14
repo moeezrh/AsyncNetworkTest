@@ -1,6 +1,7 @@
 import asyncio
 import aioping
 import logging
+import socket
 from IPScraper import scan, ip_results
 import time
 import os
@@ -21,7 +22,7 @@ async def do_ping(host, duration):
 
     program_start_time = time.time()
     retry_count = 0
-    max_retries = 10
+    max_retries = 100
 
     with open(temp_file_name, "a") as file: 
 
@@ -40,9 +41,10 @@ async def do_ping(host, duration):
 
         while ((time.time() - program_start_time) < duration) and retry_count < max_retries:
             try:           
-                delay = await aioping.ping(host, 0.5) * 1000
+                delay = await aioping.ping(host, 2) * 1000
                 state_after = "ONLINE"
                 if state_before != state_after:
+                    retry_count = 0
                     state_before = state_after
                     end_time = time.time()
                     off_time = end_time - start_time
@@ -195,6 +197,17 @@ async def main():
             summary_file = output[summary_file_start + 10: summary_file_end]
             destination_file.write(summary_file)
 
+    # date and time of end of ping test
+    now = datetime.now()
+    dt_print = now.strftime("%m/%d/%Y at %I:%M:%S %p")
+    end_time = now.strftime("%I:%M:%S %p")
+
+
+    with open(outputSummaryFile, "a") as file:
+        file.write("\nEND TIME: " + end_time)
+
+    with open(outputEventFile, "a") as file:
+         file.write("END TIME: " + end_time)
 
 
 if __name__ == "__main__":
