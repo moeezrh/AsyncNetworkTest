@@ -1,0 +1,11 @@
+{
+    "target_mac_addresses": [
+        "d8:3a:dd:$$:$$:$$",
+        "e4:5f:01:$$:$$:$$"
+    ],
+    "excluded_mac_addresses": [
+        "e4:5f:01:c0:98:44",
+        "d8:3a:dd:0c:85:62",
+        "e4:5f:01:c1:0c:75"
+    ]
+}

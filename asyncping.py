@@ -10,7 +10,7 @@ import shutil
 
 
 # Gets the path to the script
-async def get_app_path():
+def get_app_path():
     if getattr(sys, 'frozen', False):
         application_path = os.path.dirname(sys.executable)
     elif __file__:

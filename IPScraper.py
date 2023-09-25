@@ -1,5 +1,6 @@
 import scapy.all as scapy
-  
+import json 
+
 def scan(ip):
     arp_req_frame = scapy.ARP(pdst = ip)
 
@@ -18,14 +19,19 @@ def scan(ip):
 def ip_results(result):
     print("-----------------------------------\nIP Address\tMAC Address\n-----------------------------------")
     ips = []
-    excluded_ips = ["e4:5f:01:c0:98:44",
-                    "d8:3a:dd:0c:85:62",
-                    "e4:5f:01:c1:0c:75"]
+    f = open('config.json')
+    data = json.load(f)
+    target_macs = data.get("target_mac_addresses", [])
+    excluded_ips = data.get("excluded_mac_addresses", [])
+    end = target_macs[0].index('$')
+    length = end - 1
     for i in result:
-        macAddr = (i["mac"])
-        if macAddr[0:8] == "d8:3a:dd" or macAddr[0:8] == "e4:5f:01" and (macAddr not in excluded_ips):
-            print("{}\t{}".format(i["ip"], i["mac"]))
-            ips.append(i["ip"])
+        mac_addr = (i["mac"])
+        for macs in target_macs:
+            if mac_addr[0:length] == macs[0:length] and (mac_addr not in excluded_ips):
+                print("{}\t{}".format(i["ip"], i["mac"]))
+                ips.append(i["ip"])
+
     return ips
 
 
