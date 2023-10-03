@@ -7,7 +7,7 @@ import os
 import sys
 from datetime import datetime
 import shutil
-
+import json
 
 # Gets the path to the script
 def get_app_path():
@@ -30,6 +30,11 @@ async def do_ping(host, duration):
     retry_count = 0
     max_retries = 100
 
+    f = open('config.json')
+    data = json.load(f)
+    time_out = data["timeout"]
+
+
     with open(temp_file_name, "a") as file: 
         
         # Initialize start time and status
@@ -47,9 +52,9 @@ async def do_ping(host, duration):
         # While the current time passed is less than the test duration, and it hasn't failed to
         # connect more than the max retries
         while ((time.time() - program_start_time) < duration) and retry_count < max_retries:
-            # Tries to ping the host with timeout of 2 seconds, and if Timeout, records as offline
+            # Tries to ping the host with timeout of 4 seconds, and if Timeout, records as offline
             try:           
-                delay = await aioping.ping(host, 2) * 1000
+                delay = await aioping.ping(host, time_out) * 1000
                 state_after = "ONLINE"
                 if state_before != state_after:
                         retry_count = 0
@@ -61,7 +66,6 @@ async def do_ping(host, duration):
                         start_time = end_time
 
             except TimeoutError:
-                print(host + ": Timed out")
                 retry_count += 1
                 state_after = "OFFLINE"
                 if state_before != state_after:
@@ -70,13 +74,17 @@ async def do_ping(host, duration):
                         on_time = end_time - start_time
                         total_online += on_time
                         file.write("\nONLINE for " + str(on_time) + " s")
+                        file.write("\nPacket Timeout")
                         start_time = end_time
                     
         if state_after == "OFFLINE":
                 end_time = time.time()
                 off_time = end_time - start_time
                 total_offline += off_time
-                file.write("\nOFFLINE for " + str(on_time) + " s DISCONNECTED DUE TO TIMEOUT")
+                if retry_count >= max_retries:
+                    file.write("\nOFFLINE for " + str(off_time) + " s DISCONNECTED DUE TO TIMEOUT")
+                else:
+                    file.write("\nOFFLINE for " + str(off_time) + " s")
         elif state_before == state_after:
                 end_time = time.time()
                 on_time = end_time - start_time
@@ -154,9 +162,13 @@ async def main():
     dt_print = now.strftime("%m/%d/%Y at %I:%M:%S %p")
     start_time = now.strftime("%I:%M:%S %p")
 
+    f = open('config.json')
+    data = json.load(f)
+    ip_addr = data["ip_address_range"]
+
+
     # Scanning network for devices
     print("Scanning network for devices")
-    ip_addr = "192.168.1.1/23"
     scanned_output = scan(ip_addr)
     print("Testing the following IP Addresses " + dt_print + "\n")  
     ip_addresses = ip_results(scanned_output)
